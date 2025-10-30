@@ -1,0 +1,5 @@
+1. What is a statement? A statement is an instruction that the compiler can execute.
+2. What is a function? A function is a collection of statements the execute when called.
+3. What is the name of a function the all programs must have? main()
+4. What happens when the program is run? The main() function is executed in sequential order.
+5. What is a systax error? occurs when the code is not valid C++.
