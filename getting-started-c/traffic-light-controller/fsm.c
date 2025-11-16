@@ -29,7 +29,7 @@ void print_lights(const char* red, const char* yellow, const char* green, const 
 void fsm_update() {
     switch (state) {
         case STATE_RED:
-            print_lights("●", "○", "○", ped_request ? "●" : "○");
+            print_lights("X", "O", "O", ped_request ? "X" : "O");
             if (timer_expired()) {
                 if (ped_request) {
                     state = STATE_PED;
@@ -41,28 +41,28 @@ void fsm_update() {
             }
             break;
         case STATE_GREEN:
-            print_lights("○", "○", "●", ped_request ? "●" : "○");
+            print_lights("O", "O", "X", ped_request ? "X" : "O");
             if (timer_expired()) {
                 state = STATE_YELLOW;
                 set_timer(2000);
             }
             break;
         case STATE_YELLOW:
-            print_lights("○", "●", "○", ped_request ? "●" : "○");
+            print_lights("O", "X", "O", ped_request ? "X" : "O");
             if (timer_expired()) {
                 state = STATE_RED;
                 set_timer(5000);
             }
             break;
         case STATE_PED:
-            print_lights("●", "○", "○", "●");
+            print_lights("X", "O", "O", "X");
             if (timer_expired()) {
                 state = STATE_RED;
                 set_timer(5000);
             }
             break;
         case STATE_NIGHT:
-            print_lights("○",(timer_expired() ? "●" : "○"), "○", "○");
+            print_lights("O",(timer_expired() ? "X" : "O"), "O", "O");
             if (timer_expired()) {
                 set_timer(500);
             }
