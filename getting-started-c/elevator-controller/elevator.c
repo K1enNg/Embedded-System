@@ -7,7 +7,7 @@
 
 #define FLOOR 5
 #define MOVE_TIME_MS 1500
-#define DOOR_OPEN_ms 3000
+#define DOOR_OPEN_MS 3000
 
 static int current_floor;
 static int direction;
@@ -31,7 +31,7 @@ static void draw_ascii() {
         } else {
             snprintf(buf, sizeof(buf), "[ ]");
         }
-        char rq = requests[f] ? 'X' : '';
+        char rq = requests[f] ? 'X' : ' ';
         printf("FLOOR %d | %s requests %c\n", f, buf, rq);
     }
     printf("\nState: %s | Floor: %d | Direction: %s\n", 
@@ -42,8 +42,8 @@ static void draw_ascii() {
 }
 
 static bool requests_above() {
-    for (int i = current_floor + 1; i <= FLOORS, ++i) {
-        if (request[i]) {
+    for (int i = current_floor + 1; i <= FLOOR; ++i) {
+        if (requests[i]) {
             return true;
         }
     }
@@ -52,7 +52,7 @@ static bool requests_above() {
 
 static bool requests_below() {
     for (int i = current_floor - 1; i >= 1; --i) {
-        if (request[i]) {
+        if (requests[i]) {
             return true;
         }
     }
@@ -76,7 +76,7 @@ void elevator_init() {
     doors_open =false;
     door_timer_active = 0;
     move_timer_active = 0;
-    for (int i = 1; i <= FLOOR, ++i) {
+    for (int i = 1; i <= FLOOR; ++i) {
         requests[i] = false;
     }
     set_timer(0);
@@ -136,39 +136,39 @@ void elevator_update() {
         } else {
             draw_ascii();
         }
+        return;
     }
-    return;
-}
+    // Not moving & doors closed
+    // If there's any request at current floor -> oper doors
+    if (requests[current_floor]) {
+        requests[current_floor] = 0;
+        doors_open = true;
+        set_timer(DOOR_OPEN_MS);
+        door_timer_active = 1;
+        draw_ascii();
+        return;
+    }
 
-// Not moving & doors closed
-// If there's any request at current floor -> oper doors
-if (requests[current_floor]) {
-    requests[current_floor] = 0;
-    doors_open = true;
-    set_timer(DOOR_OPEN_MS);
-    door_timer_active = 1;
+    if (requests[0]) {
+        requests[0] = 0;
+        doors_open = true;
+        set_timer(DOOR_OPEN_MS);
+        door_timer_active = 1;
+        draw_ascii();
+        return;
+    }
+
+    decide_direction();
+    if (direction != 0) {
+        moving = true;
+        set_timer(MOVE_TIME_MS);
+        move_timer_active = 1;
+        draw_ascii();
+        return;
+    }
     draw_ascii();
-    return;
 }
 
-if (requests[0]) {
-    requests[0] = 0;
-    doors_open = true;
-    set_timer(DOOR_OPEN_MS)
-    door_timer_active = 1;
-    draw_ascii();
-    return;
-}
 
-decide_direction();
-if (direction != 0) {
-    moving = true;
-    set_timer(MOVE_TIME_MS);
-    move_timer_active = 1;
-    draw_ascii();
-    return;
-}
-
-draw_ascii();
 
 

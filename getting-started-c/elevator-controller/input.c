@@ -1,5 +1,6 @@
 #include <conio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "input.h"
 
 int requests[6] = {0};
