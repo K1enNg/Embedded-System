@@ -83,3 +83,92 @@ void elevator_init() {
     draw_ascii();
 }
 
+void elevator_update() {
+    if (doors_open) {
+        if(timer_expired() && door_timer_active) {
+            doors_open = false;
+            door_timer_active = 0;
+            decide_direction();
+            if (direction != 0) {
+                moving = true;
+                set_timer(MOVE_TIME_MS);
+                move_timer_active = 1;
+            }
+        }
+        draw_ascii();
+        return;
+    }
+
+    if (moving) {
+        if (timer_expired() && move_timer_active) {
+            // finish moving one floor in 'direction'
+            current_floor += direction;
+            move_timer_active = 0;
+
+            // if there is a request at this floor, stop
+            if (requests[current_floor]) {
+                requests[current_floor] = 0; 
+                moving = false,
+                doors_open = true;
+                set_timer(DOOR_OPEN_MS);
+                door_timer_active = 1;
+            } else {
+                // else: decide whether to continue in same direction
+                if ((direction > 0 && requests_above() || (direction < 0 && requests_below()))) {
+                    // continue moving
+                    moving = true;
+                    set_timer(MOVE_TIME_MS);
+                    move_timer_active = 1;
+                } else {
+                    // no more request in this direction
+                    if ((direction > 0 && requests_below() || (direction < 0 && requests_above()))) {
+                        direction = -direction;
+                        moving = true;
+                        set_timer(MOVE_TIME_MS);
+                        move_timer_active = 1;
+                    } else {
+                        moving = false;
+                        direction = 0;
+                    }
+                }
+            }
+            draw_ascii();
+        } else {
+            draw_ascii();
+        }
+    }
+    return;
+}
+
+// Not moving & doors closed
+// If there's any request at current floor -> oper doors
+if (requests[current_floor]) {
+    requests[current_floor] = 0;
+    doors_open = true;
+    set_timer(DOOR_OPEN_MS);
+    door_timer_active = 1;
+    draw_ascii();
+    return;
+}
+
+if (requests[0]) {
+    requests[0] = 0;
+    doors_open = true;
+    set_timer(DOOR_OPEN_MS)
+    door_timer_active = 1;
+    draw_ascii();
+    return;
+}
+
+decide_direction();
+if (direction != 0) {
+    moving = true;
+    set_timer(MOVE_TIME_MS);
+    move_timer_active = 1;
+    draw_ascii();
+    return;
+}
+
+draw_ascii();
+
+
