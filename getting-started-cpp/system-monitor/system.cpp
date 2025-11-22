@@ -1,6 +1,6 @@
 #include <windows.h>
 #include "system.h"
 
-insigned long long getUpTimeSeconds() {
-    
+unsigned long long getUpTimeSeconds() {
+    return GetTickCount64() / 1000;
 }
