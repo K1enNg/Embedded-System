@@ -1,7 +1,7 @@
 #include <iostream>
 
 int main() {
-    std::cout <<"Hello World"; // std::cout lives in the iostream library
+    std::cout <<"Hello World\n"; // std::cout lives in the iostream library
 
     int x; // definition of variable x
     
@@ -15,6 +15,14 @@ int main() {
     int d {};      // value-initialization (empty braces)
 
     [[maybe_unused]] int e = 9; // compiler doesn't warn about unused variables
+
+    std::cout << "Enter an integer: ";
+
+    int num{}; // define variable num as an integer vaiable
+    std::cin >> num; // get integer value from user's input
+
+    int doubleNum = num * 2; // define a new var and initialized with num * 2
+    std::cout << "Double that number is: " << doubleNum;
     
     return 0;
 }
