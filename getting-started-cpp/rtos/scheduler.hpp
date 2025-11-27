@@ -17,7 +17,11 @@ class RoundRobinScheduler: public Scheduler{
                 return nullptr;
             }
 
-            index = (index + 1) %  tasks.size();
-            return tasks[index];
+            for(int i = 0; i <= tasks.size(); i++) {
+                index = (index + 1) % tasks.size();
+                if (tasks[index]->state == TaskState::READY)
+                    return  tasks[index];
+            }
         }
+        return nullptr; // all tasks blocked
 }

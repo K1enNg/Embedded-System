@@ -4,6 +4,9 @@
 #include "task.hpp"
 
 class Kernel {
+
+    Task* currentTask = nullptr;
+
     private:
         Kernel() = default; // singleton
         Scheduler* scheduler;
@@ -25,5 +28,13 @@ class Kernel {
             tasks.pushBack(t);
         }
 
-        void tick();    
+        void tick() {
+            currentTask = t;
+            t->state = TaskState::RUNNING;
+            t->callback();
+            t->lastExec = systemTime;
+            t->state = TaskState::READY;
+            currentTask = nullptr;
+        };    
+        void sleep(Task* t, int ms);
 }

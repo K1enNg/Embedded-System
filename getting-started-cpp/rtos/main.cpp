@@ -7,7 +7,12 @@ int main() {
     k.setScheduler(new RoundRobinScheduler())
 
     k.addTask(new Task("SensorTask", 1, 1000, [](){
-        // simulate reading sensor
+        static bool on = false;
+        on = !on;
+
+        std::cout << "[BlinkTask] LED = " << (on ? "ON" : "OFF") << "\n";
+        
+        Kernel::get().sleep(Kernel::get().currentTask, 500)
     }));
 
     k.addTask(new Task("LoggerTask", 1, 1500, [](){

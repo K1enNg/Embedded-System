@@ -19,6 +19,9 @@ class Task {
         int priority;
         int period; // for periodic tasks
         int lastExec = 0;
+        
         TaskState state = TaskState::READY;
         TaskFunc callback;
+
+        int sleepUntil = 0;
 }
