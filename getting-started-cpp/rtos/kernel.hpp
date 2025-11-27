@@ -4,17 +4,15 @@
 #include "task.hpp"
 
 class Kernel {
-
-    Task* currentTask = nullptr;
-
     private:
         Kernel() = default; // singleton
         Scheduler* scheduler;
 
     public:
+        Task* currentTask = nullptr;
         static Kernel* get() {
             static Kernel instance;
-            return instance;
+            return &instance; // get return a pointer
         }
 
         std::vector<Task*> tasks;
@@ -25,16 +23,9 @@ class Kernel {
         }
 
         void addTask(Task* t) {
-            tasks.pushBack(t);
+            tasks.push_back(t);
         }
 
-        void tick() {
-            currentTask = t;
-            t->state = TaskState::RUNNING;
-            t->callback();
-            t->lastExec = systemTime;
-            t->state = TaskState::READY;
-            currentTask = nullptr;
-        };    
+        void tick();    
         void sleep(Task* t, int ms);
-}
+};

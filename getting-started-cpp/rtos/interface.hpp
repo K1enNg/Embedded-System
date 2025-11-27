@@ -1,7 +1,7 @@
 #pragma once
-#include "kernel.cpp"
+#include "kernel.hpp"
 
 class interface {
     public:
         static void render();
-}
+};
