@@ -1,30 +1,74 @@
-#include <iostream>
 #include "kernel.hpp"
-#include "interface.hpp"
-#include "scheduler.hpp"
+#include "scheduler.hpp" // factory in scheduler.cpp (make_round_robin/make_priority)
+#include "tui.hpp"
+#include <iostream>
+#include <thread>
 
+// sample tasks
+void sensor_task(TaskAPI& api) {
+    auto& q = api.kernel->get_default_queue();
+    // We'll instead use a simple loop writing to default queue via global access through TaskAPI helper
+}
+
+// To avoid adding kernel pointer into TaskAPI publicly (keeping encapsulation),
+// we will implement example tasks using lambda that capture the queue reference directly
 int main() {
-    auto* k = Kernel::get();
-    k->setScheduler(new RoundRobinScheduler());
+    // choose scheduler (round robin or priority)
+    extern std::unique_ptr<IScheduler> make_round_robin();
+    extern std::unique_ptr<IScheduler> make_priority();
 
-    k->addTask(new Task("SensorTask", 1, 1000, [](){
-        static bool on = false;
-        on = !on;
+    auto sch = make_round_robin();
+    RTOS rtos(std::move(sch));
 
-        std::cout << "[BlinkTask] LED = " << (on ? "ON" : "OFF") << "\n";
-        
-        Kernel::get()->sleep(Kernel::get()->currentTask, 500);
-    }));
+    // access queue reference to capture into tasks
+    MessageQueue<std::string>& q = rtos.get_default_queue();
 
-    k->addTask(new Task("LoggerTask", 1, 1500, [](){
-        // simulate writing logs
-    }));
+    // SensorTask: produces temperature messages
+    rtos.create_task("SensorTask",
+        [&q](TaskAPI& api) {
+            for (int i = 0; i < 10; ++i) {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "TEMP: 26.%d C", 3 - (i%3));
+                q.enqueue(std::string(buf));
+                // simulate work
+                std::this_thread::sleep_for(std::chrono::milliseconds(40));
+                api.yield();
+            }
+        }, 2);
 
-    k->addTask(new Task("UITask", 1, 100, [](){
-        interface::render();
-    }));
+    // LoggerTask: consumes from queue
+    rtos.create_task("LoggerTask",
+        [&q](TaskAPI& api) {
+            for (int i = 0; i < 10; ++i) {
+                auto msg = q.dequeue_for(200);
+                if (msg) {
+                    std::cout << "[Logger] " << *msg << "\n";
+                } else {
+                    // nothing, yield
+                }
+                api.yield();
+            }
+        }, 1);
 
-    while (true) {
-        k->tick();
-    }
+    // UITask: render TUI every 200ms
+    rtos.create_task("UITask",
+        [&rtos](TaskAPI& api) {
+            TUI tui;
+            for (int i = 0; i < 50; ++i) {
+                KernelSnapshot snap;
+                rtos.build_snapshot(snap);
+                tui.draw(snap);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                api.yield();
+            }
+        }, 3);
+
+    rtos.start();
+
+    // run simulation for a few seconds
+    std::this_thread::sleep_for(std::chrono::seconds(6));
+    rtos.stop();
+
+    std::cout << "RTOS simulation finished\n";
+    return 0;
 }

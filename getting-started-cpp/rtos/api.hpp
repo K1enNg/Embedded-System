@@ -1,7 +1,7 @@
-#include once
-#include "kernel.cpp"
+#pragma once
+#include "kernel.hpp"
 
-incline void task_sleep(int ms) {
-    auto& k = Kernel::get();
-    k.sleep(k.currentTask, ms);
+inline void task_sleep(int ms) {
+    Kernel* k = Kernel::get();
+    k->sleep(k->currentTask, ms);
 }
