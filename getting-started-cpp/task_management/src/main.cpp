@@ -1,4 +1,4 @@
-#include "application.cpp"
+#include <iostream>
 
 int main() {
     Application app;
