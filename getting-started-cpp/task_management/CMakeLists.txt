@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 4.2)
 
 project(task_management
-        VERSION 0.1.0
-        DESCRIPTION "Terminal-based Task Management App in C++"
-        LANGUAGE CXX
+    LANGUAGES CXX
+    VERSION 0.1.0
+    DESCRIPTION "Terminal-based Task Management App in C++"
 )
 
 set(CMAKE_CXX_STANDARD 23)
